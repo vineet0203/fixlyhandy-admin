@@ -9,6 +9,10 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { Provider as ReduxProvider } from "react-redux";
+import { muiTheme } from "@/theme/muiTheme";
+import { store } from "@/store";
 
 function NotFoundComponent() {
   return (
@@ -82,6 +86,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -113,7 +123,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <ReduxProvider store={store}>
+        <ThemeProvider theme={muiTheme}>
+          <CssBaseline />
+          <Outlet />
+        </ThemeProvider>
+      </ReduxProvider>
     </QueryClientProvider>
   );
 }
