@@ -3,12 +3,14 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  redirect,
 } from "@tanstack/react-router";
 
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Provider as ReduxProvider } from "react-redux";
 import { muiTheme } from "@/theme/muiTheme";
 import { store } from "@/store";
+import { authStore } from "@/store/authStore";
 
 function NotFoundComponent() {
   return (
@@ -70,6 +72,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
+  beforeLoad: ({ location }) => {
+    const isAuthenticated = authStore.isAuthenticated();
+    if (!isAuthenticated && location.pathname !== "/login") {
+      throw redirect({
+        to: "/login",
+      });
+    }
+    if (isAuthenticated && location.pathname === "/login") {
+      throw redirect({
+        to: "/",
+      });
+    }
+  },
 });
 
 function RootComponent() {
