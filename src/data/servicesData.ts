@@ -6,6 +6,8 @@ export interface Service {
   vendor?: { name: string; avatar?: string; initials?: string; avatarColor?: string; verified: boolean } | null;
   finance?: { amount: string; label: string } | null;
   category: string;
+  sub_category_id?: number | null;
+  sub_category?: string | null;
   location?: string | null;
   detailedAddress?: string | null;
   detailed_address?: string | null;

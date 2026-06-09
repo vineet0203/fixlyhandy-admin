@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Upload, X, MapPin, Compass } from "lucide-react";
+import { api } from "@/api/axiosInstance";
 import type { Service } from "@/data/servicesData";
 
 interface ServiceDialogProps {
@@ -30,23 +31,75 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
   const [detailedAddress, setDetailedAddress] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [category, setCategory] = useState<Service["category"]>("Home Services");
+  const [category, setCategory] = useState("Home Services");
+  const [subCategoryId, setSubCategoryId] = useState<number | "">("");
+  const [subCategoryName, setSubCategoryName] = useState("");
+  const [status, setStatus] = useState<"Published" | "Pending" | "Draft">("Published");
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [subCategories, setSubCategories] = useState<any[]>([]);
+  const [subCategoriesLoading, setSubCategoriesLoading] = useState(false);
 
   const [dragActive, setDragActive] = useState(false);
   const [fetchingLocation, setFetchingLocation] = useState(false);
 
+  // Fetch active categories on mount / open
+  useEffect(() => {
+    const loadCategories = async () => {
+      setCategoriesLoading(true);
+      try {
+        const response = await api.get("/api/v1/public/service-categories");
+        const fetched = response.data.data || [];
+        setCategories(fetched.filter((c: any) => c.is_active));
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    if (open) {
+      loadCategories();
+    }
+  }, [open]);
+
+  // Fetch subcategories when category changes
+  useEffect(() => {
+    const loadSubCategories = async () => {
+      if (!category || categories.length === 0) return;
+      const selectedCat = categories.find((c) => c.name === category);
+      if (!selectedCat) return;
+
+      setSubCategoriesLoading(true);
+      try {
+        const response = await api.get(`/api/v1/admin/service-sub-categories`, {
+          params: { service_category_id: selectedCat.id },
+        });
+        const fetched = response.data.data || [];
+        setSubCategories(fetched.filter((s: any) => s.is_active));
+      } catch (err) {
+        console.error("Failed to fetch sub-categories", err);
+      } finally {
+        setSubCategoriesLoading(false);
+      }
+    };
+    loadSubCategories();
+  }, [category, categories]);
+
   useEffect(() => {
     if (service) {
       setTitle(service.title);
-      setSubtitle(service.subtitle);
-      setImage(service.image);
-      setPrice(service.price.replace("PKR ", "").replace("+", ""));
-      setLocation(service.location);
-      setDetailedAddress(service.detailedAddress || "");
+      setSubtitle(service.subtitle || "");
+      setImage(service.image || "");
+      setPrice(service.price ? service.price.replace("PKR ", "").replace("+", "") : "");
+      setLocation(service.location || "");
+      setDetailedAddress(service.detailedAddress || service.detailed_address || "");
       setCategory(service.category);
-      // Mock latitude and longitude for existing services if they don't have them
-      setLatitude("31.5204");
-      setLongitude("74.3587");
+      setSubCategoryId(service.sub_category_id || "");
+      setSubCategoryName(service.sub_category || "");
+      setStatus(service.status || "Published");
+      setLatitude(service.latitude ? String(service.latitude) : "31.5204");
+      setLongitude(service.longitude ? String(service.longitude) : "74.3587");
     } else {
       setTitle("");
       setSubtitle("");
@@ -55,10 +108,20 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
       setLocation("Lahore, Pakistan");
       setDetailedAddress("");
       setCategory("Home Services");
+      setSubCategoryId("");
+      setSubCategoryName("");
+      setStatus("Published");
       setLatitude("");
       setLongitude("");
     }
   }, [service, open]);
+
+  const handleCategoryChange = (val: string) => {
+    setCategory(val);
+    setSubCategoryId("");
+    setSubCategoryName("");
+    setSubCategories([]);
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -101,7 +164,6 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
           setLongitude(lng.toFixed(6));
           
           try {
-            // Free client-side reverse geocoding via OpenStreetMap Nominatim API (requires no backend/key)
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
               {
@@ -137,7 +199,6 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
         },
         (error) => {
           console.error("Geolocation error:", error);
-          // High-quality fallback for simulator/denied scenarios
           setLatitude("31.482635");
           setLongitude("74.370354");
           setLocation("Lahore, Pakistan");
@@ -158,10 +219,14 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
       title,
       subtitle: subtitle || `${category} by Admin`,
       image: image || "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=80&h=80&fit=crop",
-      price,
+      price: price.startsWith("PKR") ? price : `PKR ${price}`,
       location,
       detailedAddress,
+      detailed_address: detailedAddress,
       category,
+      sub_category_id: subCategoryId || null,
+      sub_category: subCategoryName || null,
+      status,
       latitude: parseFloat(latitude) || 0,
       longitude: parseFloat(longitude) || 0,
     });
@@ -201,19 +266,75 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
           />
 
           <TextField
+            label="Subtitle"
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
+            fullWidth
+            variant="outlined"
+            size="small"
+            placeholder="e.g. Expert solutions"
+          />
+
+          <TextField
             label="Category"
             select
             value={category}
-            onChange={(e) => setCategory(e.target.value as Service["category"])}
+            onChange={(e) => handleCategoryChange(e.target.value)}
+            fullWidth
+            required
+            variant="outlined"
+            size="small"
+            disabled={categoriesLoading}
+          >
+            {categoriesLoading ? (
+              <MenuItem disabled value="">Loading categories...</MenuItem>
+            ) : categories.map((c) => (
+              <MenuItem key={c.id} value={c.name}>{c.name}</MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Sub-Category"
+            select
+            value={subCategoryId}
+            onChange={(e) => {
+              const subId = e.target.value as number;
+              setSubCategoryId(subId);
+              const sub = subCategories.find((s) => s.id === subId);
+              if (sub) {
+                setSubCategoryName(sub.name);
+              }
+            }}
+            fullWidth
+            required
+            variant="outlined"
+            size="small"
+            disabled={subCategoriesLoading || !category}
+          >
+            {subCategoriesLoading ? (
+              <MenuItem disabled value="">Loading sub-categories...</MenuItem>
+            ) : subCategories.length === 0 ? (
+              <MenuItem disabled value="">No sub-categories available</MenuItem>
+            ) : (
+              subCategories.map((s) => (
+                <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+              ))
+            )}
+          </TextField>
+
+          <TextField
+            label="Status"
+            select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as any)}
             fullWidth
             required
             variant="outlined"
             size="small"
           >
-            <MenuItem value="Home Services">Home Services</MenuItem>
-            <MenuItem value="Repair Services">Repair Services</MenuItem>
-            <MenuItem value="Automotive">Automotive</MenuItem>
-            <MenuItem value="Other Services">Other Services</MenuItem>
+            <MenuItem value="Published">Published</MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="Draft">Draft</MenuItem>
           </TextField>
 
           {/* Custom image upload/dropzone */}

@@ -24,6 +24,7 @@ import {
 } from "@/store/slices/servicesSlice";
 import type { Service } from "@/data/servicesData";
 import { CircularProgress } from "@mui/material";
+import { Toaster, toast } from "sonner";
 
 export function ServicesPage() {
   const dispatch = useAppDispatch();
@@ -68,19 +69,30 @@ export function ServicesPage() {
     setDeleteOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteId) {
-      dispatch(removeService(deleteId));
+      try {
+        await dispatch(removeService(deleteId)).unwrap();
+        toast.success("Service deleted successfully");
+      } catch (err: any) {
+        toast.error(err || "Failed to delete service");
+      }
       setDeleteId(null);
       setDeleteOpen(false);
     }
   };
 
-  const handleSaveService = (data: any) => {
-    if (data.id) {
-      dispatch(updateService({ id: data.id, data }));
-    } else {
-      dispatch(createService(data));
+  const handleSaveService = async (data: any) => {
+    try {
+      if (data.id) {
+        await dispatch(updateService({ id: data.id, data })).unwrap();
+        toast.success("Service updated successfully");
+      } else {
+        await dispatch(createService(data)).unwrap();
+        toast.success("Service created successfully");
+      }
+    } catch (err: any) {
+      toast.error(err || "Failed to save service");
     }
     setFormOpen(false);
   };
@@ -169,6 +181,7 @@ export function ServicesPage() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
