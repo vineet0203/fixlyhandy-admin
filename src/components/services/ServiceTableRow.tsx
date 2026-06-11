@@ -55,7 +55,6 @@ export function ServiceTableRow({
           {index + 1}
         </Box>
       </TableCell>
-      <TableCell sx={{ color: "#6B7280", fontSize: 13, fontFamily: "ui-monospace, SFMono-Regular, monospace" }}>{s.id}</TableCell>
       <TableCell>
         <div className="flex items-center gap-3">
           <Avatar variant="rounded" src={s.image || undefined} sx={{ width: 40, height: 40, borderRadius: 1.5 }} />

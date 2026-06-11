@@ -373,7 +373,6 @@ export function ServiceCategoriesPage() {
               <TableRow sx={{ "& th": { bgcolor: "#fff", borderColor: "#E5E7EB", color: "#6B7280", fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", py: 2 } }}>
                 <TableCell width={60} align="center">No.</TableCell>
                 <TableCell width={50}></TableCell>
-                <TableCell width={100}>Sort Order</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Slug</TableCell>
                 <TableCell>Description</TableCell>
@@ -385,13 +384,13 @@ export function ServiceCategoriesPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 6, color: "#6B7280" }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6, color: "#6B7280" }}>
                     Loading categories and subcategories...
                   </TableCell>
                 </TableRow>
               ) : filteredCategories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 6, color: "#6B7280" }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6, color: "#6B7280" }}>
                     {searchQuery ? "No matching service categories found." : "No service categories found. Add your first category!"}
                   </TableCell>
                 </TableRow>
@@ -434,7 +433,6 @@ export function ServiceCategoriesPage() {
                             />
                           </IconButton>
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: "#374151" }}>{category.sort_order}</TableCell>
                         <TableCell sx={{ fontWeight: 700, color: "#111827" }}>
                           <span className="flex items-center gap-2">
                             <FolderOpen size={16} className="text-[#7C3AED]" />
@@ -486,7 +484,7 @@ export function ServiceCategoriesPage() {
 
                       {/* Expandable Sub-Categories Sub-Table */}
                       <TableRow>
-                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
                           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                             <Box sx={{ margin: 2, bgcolor: "#FBFDFF", border: "1px solid #EBF3FC", borderRadius: 2, p: 2 }}>
                               <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontWeight: 700, color: "#4B5563", mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
@@ -501,7 +499,6 @@ export function ServiceCategoriesPage() {
                                   <TableHead>
                                     <TableRow sx={{ "& th": { color: "#6B7280", fontWeight: 600, fontSize: 11, borderBottom: "1px solid #E5E7EB" } }}>
                                       <TableCell width={60} align="center">No.</TableCell>
-                                      <TableCell width={100}>Sort Order</TableCell>
                                       <TableCell>Name</TableCell>
                                       <TableCell>Slug</TableCell>
                                       <TableCell>Description</TableCell>
@@ -533,7 +530,6 @@ export function ServiceCategoriesPage() {
                                             {subIndex + 1}
                                           </Box>
                                         </TableCell>
-                                        <TableCell sx={{ fontWeight: 600 }}>{sub.sort_order}</TableCell>
                                         <TableCell sx={{ fontWeight: 600, color: "#1F2937" }}>{sub.name}</TableCell>
                                         <TableCell sx={{ fontFamily: "monospace", fontSize: 12 }}>{sub.slug}</TableCell>
                                         <TableCell sx={{ color: "#6B7280", fontSize: 12 }}>{sub.description || "-"}</TableCell>

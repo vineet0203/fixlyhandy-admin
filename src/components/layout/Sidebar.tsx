@@ -28,7 +28,7 @@ const items: Item[] = [
 ];
 
 const subItems = [
-  { label: "Service Categories", href: "/service-categories", search: undefined },
+  { label: "Create Services", href: "/service-categories", search: undefined },
   { label: "All Services", href: "/services", search: undefined },
 ];
 

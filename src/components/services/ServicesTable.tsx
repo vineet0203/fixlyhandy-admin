@@ -4,7 +4,7 @@ import { ServiceTableRow } from "./ServiceTableRow";
 import { TablePagination } from "@/components/ui/TablePagination";
 import type { Service } from "@/data/servicesData";
 
-const headers = ["No.", "ID", "Service", "Vendor", "Finance", "Category", "Location", "Price", "Status", "Featured", "Date Added", "Actions"];
+const headers = ["No.", "Service", "Vendor", "Finance", "Category", "Location", "Price", "Status", "Featured", "Date Added", "Actions"];
 
 export function ServicesTable({ onEdit, onDelete }: { onEdit: (s: Service) => void; onDelete: (id: string | number) => void }) {
   const { services } = useAppSelector((s) => s.services);
