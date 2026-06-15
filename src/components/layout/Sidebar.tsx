@@ -87,7 +87,7 @@ export function Sidebar({ open = true }: { open?: boolean }) {
             <Briefcase size={18} color="#fff" />
           </div>
           <span className="font-extrabold text-[18px]" style={{ color: "#7C3AED" }}>
-            Trak<span className="text-[#111827]">Jobs</span>
+            Fixly<span className="text-[#111827]">Handy</span>
           </span>
         </Link>
       </div>

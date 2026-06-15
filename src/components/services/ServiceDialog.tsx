@@ -181,7 +181,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               {
                 headers: {
                   "Accept-Language": "en",
-                  "User-Agent": "TrackJobsAdmin/1.0",
+                  "User-Agent": "FixlyHandyAdmin/1.0",
                 },
               },
             );

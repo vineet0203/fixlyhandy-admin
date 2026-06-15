@@ -17,7 +17,7 @@ export function LoginPage() {
 
     try {
       const apiBaseUrl =
-        (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost/trakjobs-api";
+        (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost/fixlyhandy-api";
       const response = await axios.post<{
         success: boolean;
         message?: string;
@@ -113,7 +113,7 @@ export function LoginPage() {
               letterSpacing: "-0.025em",
             }}
           >
-            Trak<span style={{ color: "#111827" }}>Jobs</span>
+            Fixly<span style={{ color: "#111827" }}>Handy</span>
           </Typography>
           <Typography
             variant="body2"
