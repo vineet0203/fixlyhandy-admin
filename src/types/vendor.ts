@@ -42,6 +42,7 @@ export interface Employee {
   last_name: string;
   email: string;
   phone?: string;
+  mobile_number?: string;
   designation?: string;
   department?: string;
   is_active: boolean;
