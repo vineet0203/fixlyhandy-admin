@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Tabs,
@@ -27,14 +27,18 @@ import { CustomerTable } from "./CustomerTable";
 import { vendorService } from "@/services/vendorService";
 import type { Vendor } from "@/types/vendor";
 import { toast } from "sonner";
+import { api } from "@/api/axiosInstance";
 
 interface VendorDetailTabsProps {
   vendor: Vendor;
   onUpdate: (updatedVendor: Vendor) => void;
+  activeTab?: number;
+  onTabChange?: (newValue: number) => void;
 }
 
-export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
-  const [tabValue, setTabValue] = useState(0);
+export function VendorDetailTabs({ vendor, onUpdate, activeTab, onTabChange }: VendorDetailTabsProps) {
+  const [internalTabValue, setInternalTabValue] = useState(0);
+  const tabValue = activeTab !== undefined ? activeTab : internalTabValue;
 
   // Form State
   const [businessName, setBusinessName] = useState(vendor.business_name);
@@ -43,9 +47,76 @@ export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
   const [fullName, setFullName] = useState(vendor.full_name);
   const [email, setEmail] = useState(vendor.email);
   const [mobileNumber, setMobileNumber] = useState(vendor.mobile_number || "");
-  const [serviceCategory, setServiceCategory] = useState(vendor.service_category || "");
-  const [serviceSubCategory, setServiceSubCategory] = useState(vendor.service_sub_category || "");
   const [isAcceptingBookings, setIsAcceptingBookings] = useState(vendor.is_accepting_bookings);
+
+  // Categories & Sub-categories dropdowns state
+  interface ServiceCategory {
+    id: number;
+    name: string;
+    slug: string;
+    is_active: boolean;
+  }
+  interface ServiceSubCategory {
+    id: number;
+    name: string;
+    slug: string;
+    is_active: boolean;
+  }
+
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [subCategories, setSubCategories] = useState<ServiceSubCategory[]>([]);
+  const [subCategoriesLoading, setSubCategoriesLoading] = useState(false);
+
+  // Initialize service category and sub category state
+  const [serviceCategory, setServiceCategory] = useState<string>(vendor.service_category || "");
+  const [serviceSubCategory, setServiceSubCategory] = useState<string>(vendor.service_sub_category || "");
+
+  // Fetch active categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      setCategoriesLoading(true);
+      try {
+        const response = await api.get("/api/v1/public/service-categories");
+        const fetched = response.data?.data || [];
+        setCategories(fetched.filter((c: ServiceCategory) => c.is_active));
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Fetch subcategories when category changes
+  useEffect(() => {
+    const loadSubCategories = async () => {
+      if (!serviceCategory || categories.length === 0) return;
+      const selectedCat = categories.find((c) => c.slug === serviceCategory || c.name === serviceCategory);
+      if (!selectedCat) return;
+
+      setSubCategoriesLoading(true);
+      try {
+        const response = await api.get(`/api/v1/admin/service-sub-categories`, {
+          params: { service_category_id: selectedCat.id },
+        });
+        const fetched = response.data?.data || [];
+        setSubCategories(fetched.filter((s: ServiceSubCategory) => s.is_active));
+      } catch (err) {
+        console.error("Failed to fetch sub-categories", err);
+      } finally {
+        setSubCategoriesLoading(false);
+      }
+    };
+    loadSubCategories();
+  }, [serviceCategory, categories]);
+
+  const handleCategoryChange = (val: string) => {
+    setServiceCategory(val);
+    setServiceSubCategory("");
+    setSubCategories([]);
+  };
 
   // New Fields State
   const [vendorIdCode, setVendorIdCode] = useState(vendor.vendor_id_code || "");
@@ -63,7 +134,11 @@ export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
   const [saving, setSaving] = useState(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
+    if (onTabChange) {
+      onTabChange(newValue);
+    } else {
+      setInternalTabValue(newValue);
+    }
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -146,6 +221,16 @@ export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
+                label="Vendor ID Code"
+                value={vendorIdCode}
+                onChange={(e) => setVendorIdCode(e.target.value)}
+                placeholder="e.g. VEN-10024"
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
                 label="Business Name"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
@@ -193,7 +278,7 @@ export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
                 size="small"
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 12 }}>
               <TextField
                 label="Mobile Number"
                 value={mobileNumber}
@@ -205,40 +290,52 @@ export function VendorDetailTabs({ vendor, onUpdate }: VendorDetailTabsProps) {
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Service Category"
+                select
                 value={serviceCategory}
-                onChange={(e) => setServiceCategory(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 fullWidth
                 size="small"
-              />
+                disabled={categoriesLoading}
+              >
+                {categoriesLoading ? (
+                  <MenuItem disabled value="">
+                    Loading categories...
+                  </MenuItem>
+                ) : (
+                  categories.map((c) => (
+                    <MenuItem key={c.id} value={c.slug}>
+                      {c.name}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Service Sub Category"
+                select
                 value={serviceSubCategory}
                 onChange={(e) => setServiceSubCategory(e.target.value)}
                 fullWidth
                 size="small"
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                label="Vendor ID Code"
-                value={vendorIdCode}
-                onChange={(e) => setVendorIdCode(e.target.value)}
-                placeholder="e.g. VEN-10024"
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                label="Logo Image URL"
-                value={logoPath}
-                onChange={(e) => setLogoPath(e.target.value)}
-                placeholder="e.g. https://domain.com/logo.png"
-                fullWidth
-                size="small"
-              />
+                disabled={subCategoriesLoading || !serviceCategory}
+              >
+                {subCategoriesLoading ? (
+                  <MenuItem disabled value="">
+                    Loading sub-categories...
+                  </MenuItem>
+                ) : subCategories.length === 0 ? (
+                  <MenuItem disabled value="">
+                    No sub-categories available
+                  </MenuItem>
+                ) : (
+                  subCategories.map((s) => (
+                    <MenuItem key={s.id} value={s.slug}>
+                      {s.name}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField

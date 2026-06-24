@@ -13,11 +13,13 @@ import { toggleServiceStatus } from "@/store/slices/servicesSlice";
 export function ServiceTableRow({
   s,
   index,
+  onView,
   onEdit,
   onDelete,
 }: {
   s: Service;
   index: number;
+  onView: (s: Service) => void;
   onEdit: (s: Service) => void;
   onDelete: (id: string | number) => void;
 }) {
@@ -102,7 +104,7 @@ export function ServiceTableRow({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-0.5">
-          <IconButton size="small">
+          <IconButton size="small" onClick={() => onView(s)}>
             <Eye size={16} className="text-[#9CA3AF]" />
           </IconButton>
           <IconButton size="small" onClick={() => onEdit(s)}>

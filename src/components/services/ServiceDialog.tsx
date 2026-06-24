@@ -32,9 +32,10 @@ interface ServiceDialogProps {
   onClose: () => void;
   onSave: (serviceData: Partial<Service>) => void;
   service?: Service | null;
+  readOnly?: boolean;
 }
 
-export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogProps) {
+export function ServiceDialog({ open, onClose, onSave, service, readOnly = false }: ServiceDialogProps) {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [image, setImage] = useState("");
@@ -271,7 +272,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={{ fontWeight: 800, fontSize: "1.25rem", pb: 1, color: "#111827" }}>
-          {service ? "Edit Service" : "Add New Service"}
+          {readOnly ? "View Service" : service ? "Edit Service" : "Add New Service"}
         </DialogTitle>
 
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
@@ -283,6 +284,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             required
             variant="outlined"
             size="small"
+            disabled={readOnly}
             sx={{ mt: 1 }}
           />
 
@@ -294,6 +296,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             variant="outlined"
             size="small"
             placeholder="e.g. Expert solutions"
+            disabled={readOnly}
           />
 
           <TextField
@@ -305,7 +308,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             required
             variant="outlined"
             size="small"
-            disabled={categoriesLoading}
+            disabled={categoriesLoading || readOnly}
           >
             {categoriesLoading ? (
               <MenuItem disabled value="">
@@ -336,7 +339,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             required
             variant="outlined"
             size="small"
-            disabled={subCategoriesLoading || !category}
+            disabled={subCategoriesLoading || !category || readOnly}
           >
             {subCategoriesLoading ? (
               <MenuItem disabled value="">
@@ -364,6 +367,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             required
             variant="outlined"
             size="small"
+            disabled={readOnly}
           >
             <MenuItem value="Published">Published</MenuItem>
             <MenuItem value="Pending">Pending</MenuItem>
@@ -378,26 +382,29 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             {image ? (
               <Box className="relative w-full h-36 rounded-lg overflow-hidden border border-[#E5E7EB] bg-[#F9FAFB] flex items-center justify-center">
                 <img src={image} alt="Service preview" className="object-cover w-full h-full" />
-                <button
-                  type="button"
-                  onClick={() => setImage("")}
-                  className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full hover:bg-white text-gray-500 hover:text-red-500 shadow transition-colors"
-                >
-                  <X size={16} />
-                </button>
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => setImage("")}
+                    className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full hover:bg-white text-gray-500 hover:text-red-500 shadow transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
               </Box>
             ) : (
               <Box
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onDrop={handleDrop}
-                className={`w-full h-36 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition-all ${
+                onDragEnter={readOnly ? undefined : handleDrag}
+                onDragOver={readOnly ? undefined : handleDrag}
+                onDragLeave={readOnly ? undefined : handleDrag}
+                onDrop={readOnly ? undefined : handleDrop}
+                className={`w-full h-36 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 transition-all ${
+                  readOnly ? "border-gray-200 bg-[#F9FAFB] cursor-default opacity-85" :
                   dragActive
-                    ? "border-[#7C3AED] bg-[#7C3AED]/5"
-                    : "border-[#D1D5DB] hover:border-[#7C3AED] bg-[#F9FAFB] hover:bg-purple-50/20"
+                    ? "border-[#7C3AED] bg-[#7C3AED]/5 cursor-pointer"
+                    : "border-[#D1D5DB] hover:border-[#7C3AED] bg-[#F9FAFB] hover:bg-purple-50/20 cursor-pointer"
                 }`}
-                onClick={() => document.getElementById("file-upload")?.click()}
+                onClick={readOnly ? undefined : () => document.getElementById("file-upload")?.click()}
               >
                 <input
                   id="file-upload"
@@ -405,14 +412,17 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
                   accept="image/*"
                   className="hidden"
                   onChange={handleFileChange}
+                  disabled={readOnly}
                 />
                 <Upload size={24} className="text-[#9CA3AF] mb-2" />
                 <Typography variant="body2" className="text-gray-600 font-semibold text-center">
-                  Drag & drop an image, or <span className="text-[#7C3AED]">browse</span>
+                  {readOnly ? "No image uploaded" : <>Drag & drop an image, or <span className="text-[#7C3AED]">browse</span></>}
                 </Typography>
-                <Typography variant="caption" className="text-gray-400 mt-1 text-center">
-                  PNG, JPG or GIF up to 5MB
-                </Typography>
+                {!readOnly && (
+                  <Typography variant="caption" className="text-gray-400 mt-1 text-center">
+                    PNG, JPG or GIF up to 5MB
+                  </Typography>
+                )}
               </Box>
             )}
 
@@ -425,6 +435,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               variant="outlined"
               size="small"
               placeholder="https://example.com/image.jpg"
+              disabled={readOnly}
               sx={{ mt: 0.5 }}
             />
           </Box>
@@ -438,6 +449,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             variant="outlined"
             size="small"
             placeholder="e.g. 1,500+"
+            disabled={readOnly}
           />
 
           <Box className="flex items-center justify-between mt-1 flex-wrap gap-2">
@@ -445,28 +457,30 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               <MapPin size={16} className="text-[#9CA3AF]" />
               <span>Location & Coordinates</span>
             </Box>
-            <Button
-              type="button"
-              variant="text"
-              size="small"
-              startIcon={
-                fetchingLocation ? (
-                  <CircularProgress size={14} color="inherit" />
-                ) : (
-                  <Compass size={14} />
-                )
-              }
-              onClick={handleFetchLocation}
-              disabled={fetchingLocation}
-              sx={{
-                color: "#7C3AED",
-                textTransform: "none",
-                fontWeight: 600,
-                "&:hover": { bgcolor: "#7C3AED/10" },
-              }}
-            >
-              {fetchingLocation ? "Fetching..." : "Fetch Current Location"}
-            </Button>
+            {!readOnly && (
+              <Button
+                type="button"
+                variant="text"
+                size="small"
+                startIcon={
+                  fetchingLocation ? (
+                    <CircularProgress size={14} color="inherit" />
+                  ) : (
+                    <Compass size={14} />
+                  )
+                }
+                onClick={handleFetchLocation}
+                disabled={fetchingLocation}
+                sx={{
+                  color: "#7C3AED",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": { bgcolor: "#7C3AED/10" },
+                }}
+              >
+                {fetchingLocation ? "Fetching..." : "Fetch Current Location"}
+              </Button>
+            )}
           </Box>
 
           <TextField
@@ -478,6 +492,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             variant="outlined"
             size="small"
             placeholder="e.g. Lahore, Pakistan"
+            disabled={readOnly}
           />
 
           <TextField
@@ -491,6 +506,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
             variant="outlined"
             size="small"
             placeholder="e.g. House 45-B, Sector Z, Phase 3, Lahore"
+            disabled={readOnly}
           />
 
           <Box className="grid grid-cols-2 gap-3">
@@ -502,6 +518,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               variant="outlined"
               size="small"
               placeholder="e.g. 31.5204"
+              disabled={readOnly}
             />
             <TextField
               label="Longitude"
@@ -511,6 +528,7 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               variant="outlined"
               size="small"
               placeholder="e.g. 74.3587"
+              disabled={readOnly}
             />
           </Box>
         </DialogContent>
@@ -525,19 +543,21 @@ export function ServiceDialog({ open, onClose, onSave, service }: ServiceDialogP
               "&:hover": { borderColor: "#D1D5DB", bgcolor: "#F9FAFB" },
             }}
           >
-            Cancel
+            {readOnly ? "Close" : "Cancel"}
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{
-              bgcolor: "#7C3AED",
-              "&:hover": { bgcolor: "#6D28D9" },
-              boxShadow: "0 4px 12px -2px rgba(124,58,237,.3)",
-            }}
-          >
-            {service ? "Save Changes" : "Create Service"}
-          </Button>
+          {!readOnly && (
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: "#7C3AED",
+                "&:hover": { bgcolor: "#6D28D9" },
+                boxShadow: "0 4px 12px -2px rgba(124,58,237,.3)",
+              }}
+            >
+              {service ? "Save Changes" : "Create Service"}
+            </Button>
+          )}
         </DialogActions>
       </form>
     </Dialog>
