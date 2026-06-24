@@ -27,6 +27,7 @@ import { vendorService } from "@/services/vendorService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { Customer } from "@/types/vendor";
 import { toast } from "sonner";
+import { CustomerResetPassword } from "./CustomerResetPassword";
 
 interface CustomerTableProps {
   vendorId: number;
@@ -310,6 +311,7 @@ export function CustomerTable({ vendorId }: CustomerTableProps) {
                               <Pencil size={16} className="text-[#7C3AED]" />
                             </IconButton>
                           </Tooltip>
+                          <CustomerResetPassword id={c.id} email={c.email} onSuccess={fetchCustomers} />
                           <Tooltip title="Delete Customer">
                             <IconButton size="small" onClick={() => handleDeleteClick(c.id)}>
                               <Trash2 size={16} className="text-red-500" />

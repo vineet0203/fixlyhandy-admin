@@ -52,6 +52,9 @@ export const vendorService = {
   resetVendorPassword: async (id: number, password: string): Promise<void> => {
     await api.patch(`/api/v1/admin/vendors/${id}/reset-password`, { password });
   },
+  resetCustomerPassword: async (id: number, password: string): Promise<void> => {
+    await api.patch(`/api/v1/admin/customers/${id}/reset-password`, { password });
+  },
 
   getVendorEmployees: async (
     id: number,
