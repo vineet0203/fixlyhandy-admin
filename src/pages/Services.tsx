@@ -37,6 +37,7 @@ export function ServicesPage() {
   // Service Add/Edit Dialog state
   const [formOpen, setFormOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [readOnly, setReadOnly] = useState(false);
 
   // Delete Confirmation Dialog state
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -49,6 +50,7 @@ export function ServicesPage() {
   useEffect(() => {
     if (search.action === "new") {
       setSelectedService(null);
+      setReadOnly(false);
       setFormOpen(true);
       // Clean the search parameter so closing/reopening works correctly
       navigate({
@@ -60,11 +62,19 @@ export function ServicesPage() {
 
   const handleAddNew = () => {
     setSelectedService(null);
+    setReadOnly(false);
     setFormOpen(true);
   };
 
   const handleEdit = (service: Service) => {
     setSelectedService(service);
+    setReadOnly(false);
+    setFormOpen(true);
+  };
+
+  const handleView = (service: Service) => {
+    setSelectedService(service);
+    setReadOnly(true);
     setFormOpen(true);
   };
 
@@ -138,7 +148,7 @@ export function ServicesPage() {
           <CircularProgress size={40} sx={{ color: "#7C3AED" }} />
         </div>
       ) : (
-        <ServicesTable onEdit={handleEdit} onDelete={handleDeleteClick} />
+        <ServicesTable onView={handleView} onEdit={handleEdit} onDelete={handleDeleteClick} />
       )}
 
       {/* Add / Edit Form Dialog */}
@@ -147,6 +157,7 @@ export function ServicesPage() {
         onClose={() => setFormOpen(false)}
         onSave={handleSaveService}
         service={selectedService}
+        readOnly={readOnly}
       />
 
       {/* Delete Confirmation Dialog */}

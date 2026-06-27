@@ -55,6 +55,13 @@ const items: Item[] = [
     href: "/vendors",
     subItems: [{ label: "All Vendors", href: "/vendors", search: undefined }],
   },
+  {
+    icon: Users,
+    label: "Employees",
+    expandable: true,
+    href: "/employees",
+    subItems: [{ label: "All Employees", href: "/employees", search: undefined }],
+  },
   { icon: CreditCard, label: "Finance", expandable: true },
   { icon: Briefcase, label: "Jobs", expandable: true },
   { icon: Building2, label: "Employers", expandable: true },

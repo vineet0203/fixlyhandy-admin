@@ -7,9 +7,5 @@ export const Route = createFileRoute("/service-categories")({
 });
 
 function Page() {
-  return (
-    <MainLayout>
-      <ServiceCategoriesPage />
-    </MainLayout>
-  );
+  return <ServiceCategoriesPage />;
 }

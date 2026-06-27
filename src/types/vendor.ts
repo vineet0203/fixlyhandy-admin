@@ -14,6 +14,32 @@ export interface Vendor {
   employee_count: number;
   customer_count: number;
   created_at: string;
+  vendor_id_code?: string;
+  logo_path?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
+  total_jobs?: number;
+  completed_jobs?: number;
+  upcoming_jobs?: number;
+  total_earnings?: number;
+  pending_payments?: number;
+  pending_invoices_count?: number;
+  job_schedule?: any[];
+  past_jobs?: any[];
+  earnings_summary?: {
+    total_earnings: number;
+    paid_amount: number;
+    pending_amount: number;
+    this_month: {
+      total_earnings: number;
+      paid_amount: number;
+      pending_amount: number;
+    };
+  };
   user?: {
     id: number;
     email: string;
@@ -42,6 +68,7 @@ export interface Employee {
   last_name: string;
   email: string;
   phone?: string;
+  mobile_number?: string;
   designation?: string;
   department?: string;
   is_active: boolean;

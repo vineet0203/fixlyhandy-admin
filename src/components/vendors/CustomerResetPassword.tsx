@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  TextField,
-  InputAdornment,
-  IconButton,
+   Button,
+   Dialog,
+   DialogTitle,
+   DialogContent,
+   DialogActions,
+   Typography,
+   TextField,
+   InputAdornment,
+   IconButton,
 } from "@mui/material";
 import { KeyRound, Eye, EyeOff } from "lucide-react";
 import { vendorService } from "@/services/vendorService";
 import { toast } from "sonner";
 
-interface VendorResetPasswordProps {
+interface CustomerResetPasswordProps {
   id: number;
   email: string;
   onSuccess?: () => void;
 }
 
-export function VendorResetPassword({ id, email, onSuccess }: VendorResetPasswordProps) {
+export function CustomerResetPassword({ id, email, onSuccess }: CustomerResetPasswordProps) {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -47,8 +47,8 @@ export function VendorResetPassword({ id, email, onSuccess }: VendorResetPasswor
 
     setLoading(true);
     try {
-      await vendorService.resetVendorPassword(id, password);
-      toast.success("Password reset successfully. Vendor can now log in directly.");
+      await vendorService.resetCustomerPassword(id, password);
+      toast.success("Customer password reset successfully.");
       setOpen(false);
       if (onSuccess) onSuccess();
     } catch (err) {
@@ -65,22 +65,9 @@ export function VendorResetPassword({ id, email, onSuccess }: VendorResetPasswor
 
   return (
     <>
-      <Button
-        variant="outlined"
-        color="secondary"
-        size="small"
-        startIcon={<KeyRound size={14} />}
-        onClick={handleOpen}
-        disabled={loading}
-        sx={{
-          textTransform: "none",
-          borderColor: "#EDE9FE",
-          color: "#7C3AED",
-          "&:hover": { borderColor: "#DDD6FE", bgcolor: "#F5F3FF" },
-        }}
-      >
-        Reset Password
-      </Button>
+      <IconButton size="small" onClick={handleOpen} disabled={loading} title="Reset Password">
+        <KeyRound size={16} className="text-amber-600" />
+      </IconButton>
 
       <Dialog
         open={open}
@@ -96,12 +83,12 @@ export function VendorResetPassword({ id, email, onSuccess }: VendorResetPasswor
           },
         }}
       >
-        <DialogTitle className="font-extrabold text-[#111827]">Reset Vendor Password</DialogTitle>
+        <DialogTitle className="font-extrabold text-[#111827]">Reset Customer Password</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Typography className="text-gray-600 text-sm mb-4">
-              Enter a new custom password for the vendor owner account (<strong>{email}</strong>).
-              They will be able to log in directly using this password.
+              Enter a new custom password for the customer account (<strong>{email}</strong>). They
+              will be able to log in using this password.
             </Typography>
             <TextField
               label="New Password"
@@ -152,4 +139,4 @@ export function VendorResetPassword({ id, email, onSuccess }: VendorResetPasswor
     </>
   );
 }
-export default VendorResetPassword;
+export default CustomerResetPassword;

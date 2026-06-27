@@ -17,32 +17,47 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  MenuItem,
   Grid,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { employeeService, EmployeeWithVendor } from "@/services/employeeService";
 import { vendorService } from "@/services/vendorService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import type { Employee } from "@/types/vendor";
+import { EmployeeResetPassword } from "./EmployeeResetPassword";
+import type { Vendor } from "@/types/vendor";
 import { toast } from "sonner";
 
 import { formatTitleCase } from "@/lib/utils";
 
 interface EmployeeTableProps {
-  vendorId: number;
+  employees: EmployeeWithVendor[];
+  loading: boolean;
+  page: number;
+  rowsPerPage: number;
+  totalCount: number;
+  onPageChange: (newPage: number) => void;
+  onRowsPerPageChange: (newRowsPerPage: number) => void;
+  onRefresh: () => void;
 }
 
-export function EmployeeTable({ vendorId }: EmployeeTableProps) {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
-
+export function EmployeeTable({
+  employees,
+  loading,
+  page,
+  rowsPerPage,
+  totalCount,
+  onPageChange,
+  onRowsPerPageChange,
+  onRefresh,
+}: EmployeeTableProps) {
   // Dialog & Form states
   const [openDialog, setOpenDialog] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+  const [editEmployee, setEditEmployee] = useState<EmployeeWithVendor | null>(null);
+  const [vendorId, setVendorId] = useState<number | "">("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,59 +67,43 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
   const [isActive, setIsActive] = useState(true);
   const [formSaving, setFormSaving] = useState(false);
 
+  // Vendor list for dropdown
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loadingVendors, setLoadingVendors] = useState(false);
+
   // Deletion states
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const fetchEmployees = useCallback(async () => {
-    setLoading(true);
+  const fetchVendors = useCallback(async () => {
+    setLoadingVendors(true);
     try {
-      const response = await vendorService.getVendorEmployees(vendorId, {
-        page: page + 1,
-        per_page: rowsPerPage,
-      });
-      setEmployees(response.data);
-      setTotalCount(response.meta.total);
+      const response = await vendorService.getVendors({ per_page: 100 });
+      setVendors(response.data);
     } catch (err) {
-      toast.error("Failed to load employees");
+      toast.error("Failed to load vendors for selector");
     } finally {
-      setLoading(false);
+      setLoadingVendors(false);
     }
-  }, [vendorId, page, rowsPerPage]);
+  }, []);
 
   useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+    fetchVendors();
+  }, [fetchVendors]);
 
   const handleToggleStatus = async (employeeId: number, currentStatus: boolean) => {
-    // Optimistic UI update
-    setEmployees((prev) =>
-      prev.map((e) => (e.id === employeeId ? { ...e, is_active: !currentStatus } : e)),
-    );
-
     try {
-      await vendorService.toggleEmployeeStatus(vendorId, employeeId);
+      await employeeService.toggleEmployeeStatus(employeeId);
       toast.success("Employee status updated successfully");
+      onRefresh();
     } catch (err) {
-      // Revert on failure
-      setEmployees((prev) =>
-        prev.map((e) => (e.id === employeeId ? { ...e, is_active: currentStatus } : e)),
-      );
       toast.error("Failed to update employee status");
     }
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   const handleCreateOpen = () => {
     setEditEmployee(null);
+    setVendorId("");
     setFirstName("");
     setLastName("");
     setEmail("");
@@ -115,8 +114,9 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
     setOpenDialog(true);
   };
 
-  const handleEditOpen = (emp: Employee) => {
+  const handleEditOpen = (emp: EmployeeWithVendor) => {
     setEditEmployee(emp);
+    setVendorId(emp.vendor_id);
     setFirstName(emp.first_name || emp.name?.split(" ")[0] || "");
     setLastName(emp.last_name || emp.name?.split(" ").slice(1).join(" ") || "");
     setEmail(emp.email);
@@ -129,9 +129,14 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!vendorId) {
+      toast.error("Please select a vendor");
+      return;
+    }
     setFormSaving(true);
     try {
       const payload = {
+        vendor_id: Number(vendorId),
         first_name: firstName,
         last_name: lastName,
         email,
@@ -142,14 +147,14 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
       };
 
       if (editEmployee) {
-        await vendorService.updateVendorEmployee(vendorId, editEmployee.id, payload);
+        await employeeService.updateEmployee(editEmployee.id, payload);
         toast.success("Employee updated successfully");
       } else {
-        await vendorService.addVendorEmployee(vendorId, payload);
+        await employeeService.addEmployee(payload);
         toast.success("Employee created successfully. Setup email sent.");
       }
       setOpenDialog(false);
-      fetchEmployees();
+      onRefresh();
     } catch (err) {
       const apiErr = err as { response?: { data?: { message?: string } } };
       toast.error(apiErr.response?.data?.message || "Failed to save employee");
@@ -166,21 +171,15 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
   const handleConfirmDelete = async () => {
     if (deleteId) {
       try {
-        await vendorService.deleteVendorEmployee(vendorId, deleteId);
+        await employeeService.deleteEmployee(deleteId);
         toast.success("Employee deleted successfully");
-        fetchEmployees();
+        onRefresh();
       } catch (err) {
         const apiErr = err as { response?: { data?: { message?: string } } };
         toast.error(apiErr.response?.data?.message || "Failed to delete employee");
       }
     }
     setDeleteOpen(false);
-  };
-
-  const handleClose = () => {
-    if (!formSaving) {
-      setOpenDialog(false);
-    }
   };
 
   return (
@@ -223,13 +222,11 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
             <CircularProgress size={40} sx={{ color: "#7C3AED" }} />
           </Box>
         ) : employees.length === 0 ? (
-          <Box className="text-center py-12 text-[#6B7280]">
-            No employees found for this vendor.
-          </Box>
+          <Box className="text-center py-12 text-[#6B7280]">No employees found.</Box>
         ) : (
           <>
             <TableContainer>
-              <Table sx={{ minWidth: 600 }}>
+              <Table sx={{ minWidth: 700 }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -250,6 +247,7 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
                     </TableCell>
                     <TableCell>Name</TableCell>
                     <TableCell>Email</TableCell>
+                    <TableCell>Vendor</TableCell>
                     <TableCell>Phone</TableCell>
                     <TableCell>Designation</TableCell>
                     <TableCell>Department</TableCell>
@@ -291,7 +289,12 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
                         {e.name || `${e.first_name} ${e.last_name}`}
                       </TableCell>
                       <TableCell sx={{ color: "#4B5563" }}>{e.email}</TableCell>
-                      <TableCell sx={{ color: "#4B5563" }}>{e.phone || "-"}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#7C3AED" }}>
+                        {e.vendor?.business_name || `ID: ${e.vendor_id}`}
+                      </TableCell>
+                      <TableCell sx={{ color: "#4B5563" }}>
+                        {e.mobile_number || e.phone || "-"}
+                      </TableCell>
                       <TableCell sx={{ color: "#4B5563" }}>{formatTitleCase(e.designation) || "-"}</TableCell>
                       <TableCell sx={{ color: "#4B5563" }}>{formatTitleCase(e.department) || "-"}</TableCell>
                       <TableCell align="center">
@@ -311,11 +314,19 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
                       </TableCell>
                       <TableCell align="right" sx={{ pr: 3 }}>
                         <div className="flex items-center justify-end gap-1">
+                          <Tooltip title="View Details">
+                            <Link to="/employees/$id" params={{ id: String(e.id) }}>
+                              <IconButton size="small">
+                                <Eye size={16} className="text-[#7C3AED]" />
+                              </IconButton>
+                            </Link>
+                          </Tooltip>
                           <Tooltip title="Edit Employee">
                             <IconButton size="small" onClick={() => handleEditOpen(e)}>
                               <Pencil size={16} className="text-[#7C3AED]" />
                             </IconButton>
                           </Tooltip>
+                          <EmployeeResetPassword id={e.id} email={e.email} onSuccess={onRefresh} />
                           <Tooltip title="Delete Employee">
                             <IconButton size="small" onClick={() => handleDeleteClick(e.id)}>
                               <Trash2 size={16} className="text-red-500" />
@@ -334,8 +345,8 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
               count={totalCount}
               rowsPerPage={rowsPerPage}
               page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={(e, newPage) => onPageChange(newPage)}
+              onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
               sx={{ borderTop: "1px solid #E5E7EB" }}
             />
           </>
@@ -345,7 +356,7 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
       {/* Form Dialog */}
       <Dialog
         open={openDialog}
-        onClose={handleClose}
+        onClose={() => !formSaving && setOpenDialog(false)}
         slotProps={{
           paper: {
             sx: {
@@ -363,6 +374,24 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
         <form onSubmit={handleFormSubmit}>
           <DialogContent>
             <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  select
+                  label="Vendor Business"
+                  value={vendorId}
+                  onChange={(e) => setVendorId(Number(e.target.value))}
+                  required
+                  fullWidth
+                  size="small"
+                  disabled={loadingVendors}
+                >
+                  {vendors.map((v) => (
+                    <MenuItem key={v.id} value={v.id}>
+                      {v.business_name} ({v.full_name})
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="First Name"
@@ -426,7 +455,11 @@ export function EmployeeTable({ vendorId }: EmployeeTableProps) {
             </Grid>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 1.5 }}>
-            <Button onClick={handleClose} disabled={formSaving} sx={{ textTransform: "none" }}>
+            <Button
+              onClick={() => setOpenDialog(false)}
+              disabled={formSaving}
+              sx={{ textTransform: "none" }}
+            >
               Cancel
             </Button>
             <Button

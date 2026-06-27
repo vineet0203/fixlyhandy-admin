@@ -27,9 +27,11 @@ const headers = [
 ];
 
 export function ServicesTable({
+  onView,
   onEdit,
   onDelete,
 }: {
+  onView: (s: Service) => void;
   onEdit: (s: Service) => void;
   onDelete: (id: string | number) => void;
 }) {
@@ -63,7 +65,14 @@ export function ServicesTable({
           </TableHead>
           <TableBody>
             {services.map((s, i) => (
-              <ServiceTableRow key={s.id} s={s} index={i} onEdit={onEdit} onDelete={onDelete} />
+              <ServiceTableRow
+                key={s.id}
+                s={s}
+                index={i}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             ))}
           </TableBody>
         </Table>

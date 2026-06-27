@@ -49,9 +49,11 @@ export const vendorService = {
     return response.data.data;
   },
 
-  resetVendorPassword: async (id: number): Promise<{ new_password: string }> => {
-    const response = await api.patch(`/api/v1/admin/vendors/${id}/reset-password`);
-    return response.data.data;
+  resetVendorPassword: async (id: number, password: string): Promise<void> => {
+    await api.patch(`/api/v1/admin/vendors/${id}/reset-password`, { password });
+  },
+  resetCustomerPassword: async (id: number, password: string): Promise<void> => {
+    await api.patch(`/api/v1/admin/customers/${id}/reset-password`, { password });
   },
 
   getVendorEmployees: async (
@@ -59,7 +61,36 @@ export const vendorService = {
     params?: { page?: number; per_page?: number },
   ): Promise<PaginatedResponse<Employee>> => {
     const response = await api.get(`/api/v1/admin/vendors/${id}/employees`, { params });
+    return {
+      data: Array.isArray(response.data?.data) ? response.data.data : [],
+      meta: {
+        current_page: response.data?.meta?.current_page || 1,
+        last_page: response.data?.meta?.last_page || 1,
+        per_page: response.data?.meta?.per_page || 10,
+        total: response.data?.meta?.total || 0,
+      },
+    };
+  },
+
+  addVendorEmployee: async (id: number, data: Partial<Employee>): Promise<Employee> => {
+    const response = await api.post(`/api/v1/admin/vendors/${id}/employees`, data);
     return response.data.data;
+  },
+
+  updateVendorEmployee: async (
+    vendorId: number,
+    employeeId: number,
+    data: Partial<Employee>,
+  ): Promise<Employee> => {
+    const response = await api.put(
+      `/api/v1/admin/vendors/${vendorId}/employees/${employeeId}`,
+      data,
+    );
+    return response.data.data;
+  },
+
+  deleteVendorEmployee: async (vendorId: number, employeeId: number): Promise<void> => {
+    await api.delete(`/api/v1/admin/vendors/${vendorId}/employees/${employeeId}`);
   },
 
   getVendorCustomers: async (
@@ -67,7 +98,36 @@ export const vendorService = {
     params?: { page?: number; per_page?: number },
   ): Promise<PaginatedResponse<Customer>> => {
     const response = await api.get(`/api/v1/admin/vendors/${id}/customers`, { params });
+    return {
+      data: Array.isArray(response.data?.data) ? response.data.data : [],
+      meta: {
+        current_page: response.data?.meta?.current_page || 1,
+        last_page: response.data?.meta?.last_page || 1,
+        per_page: response.data?.meta?.per_page || 10,
+        total: response.data?.meta?.total || 0,
+      },
+    };
+  },
+
+  addVendorCustomer: async (id: number, data: Partial<Customer>): Promise<Customer> => {
+    const response = await api.post(`/api/v1/admin/vendors/${id}/customers`, data);
     return response.data.data;
+  },
+
+  updateVendorCustomer: async (
+    vendorId: number,
+    customerId: number,
+    data: Partial<Customer>,
+  ): Promise<Customer> => {
+    const response = await api.put(
+      `/api/v1/admin/vendors/${vendorId}/customers/${customerId}`,
+      data,
+    );
+    return response.data.data;
+  },
+
+  deleteVendorCustomer: async (vendorId: number, customerId: number): Promise<void> => {
+    await api.delete(`/api/v1/admin/vendors/${vendorId}/customers/${customerId}`);
   },
 
   toggleEmployeeStatus: async (vendorId: number, employeeId: number): Promise<Employee> => {

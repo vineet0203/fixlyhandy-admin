@@ -82,15 +82,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   },
 });
 
+import { MainLayout } from "@/components/layout/MainLayout";
+import { useLocation } from "@tanstack/react-router";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   return (
     <QueryClientProvider client={queryClient}>
       <ReduxProvider store={store}>
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
-          <Outlet />
+          {isLoginPage ? (
+            <Outlet />
+          ) : (
+            <MainLayout>
+              <Outlet />
+            </MainLayout>
+          )}
         </ThemeProvider>
       </ReduxProvider>
     </QueryClientProvider>

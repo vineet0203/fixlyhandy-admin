@@ -13,9 +13,5 @@ export const Route = createFileRoute("/services")({
 });
 
 function Page() {
-  return (
-    <MainLayout>
-      <ServicesPage />
-    </MainLayout>
-  );
+  return <ServicesPage />;
 }
