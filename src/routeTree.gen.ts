@@ -10,10 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendorsRouteImport } from './routes/vendors'
+import { Route as UsersRouteImport } from './routes/users'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ServiceCategoriesRouteImport } from './routes/service-categories'
+import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as PagesRouteImport } from './routes/pages'
+import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as NewsBlogRouteImport } from './routes/news-blog'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ListingsRouteImport } from './routes/listings'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as JobSeekersRouteImport } from './routes/job-seekers'
+import { Route as FinanceRouteImport } from './routes/finance'
+import { Route as EmployersRouteImport } from './routes/employers'
 import { Route as EmployeesRouteImport } from './routes/employees'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CouponsRouteImport } from './routes/coupons'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorsIndexRouteImport } from './routes/vendors.index'
 import { Route as EmployeesIndexRouteImport } from './routes/employees.index'
@@ -23,6 +37,16 @@ import { Route as EmployeesIdRouteImport } from './routes/employees.$id'
 const VendorsRoute = VendorsRouteImport.update({
   id: '/vendors',
   path: '/vendors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -35,14 +59,74 @@ const ServiceCategoriesRoute = ServiceCategoriesRouteImport.update({
   path: '/service-categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewsRoute = ReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagesRoute = PagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsBlogRoute = NewsBlogRouteImport.update({
+  id: '/news-blog',
+  path: '/news-blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListingsRoute = ListingsRouteImport.update({
+  id: '/listings',
+  path: '/listings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobSeekersRoute = JobSeekersRouteImport.update({
+  id: '/job-seekers',
+  path: '/job-seekers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceRoute = FinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployersRoute = EmployersRouteImport.update({
+  id: '/employers',
+  path: '/employers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeesRoute = EmployeesRouteImport.update({
   id: '/employees',
   path: '/employees',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CouponsRoute = CouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -73,10 +157,24 @@ const EmployeesIdRoute = EmployeesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coupons': typeof CouponsRoute
+  '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRouteWithChildren
+  '/employers': typeof EmployersRoute
+  '/finance': typeof FinanceRoute
+  '/job-seekers': typeof JobSeekersRoute
+  '/jobs': typeof JobsRoute
+  '/listings': typeof ListingsRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/news-blog': typeof NewsBlogRoute
+  '/orders': typeof OrdersRoute
+  '/pages': typeof PagesRoute
+  '/reviews': typeof ReviewsRoute
   '/service-categories': typeof ServiceCategoriesRoute
   '/services': typeof ServicesRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRoute
   '/vendors': typeof VendorsRouteWithChildren
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
@@ -85,9 +183,23 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coupons': typeof CouponsRoute
+  '/dashboard': typeof DashboardRoute
+  '/employers': typeof EmployersRoute
+  '/finance': typeof FinanceRoute
+  '/job-seekers': typeof JobSeekersRoute
+  '/jobs': typeof JobsRoute
+  '/listings': typeof ListingsRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/news-blog': typeof NewsBlogRoute
+  '/orders': typeof OrdersRoute
+  '/pages': typeof PagesRoute
+  '/reviews': typeof ReviewsRoute
   '/service-categories': typeof ServiceCategoriesRoute
   '/services': typeof ServicesRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
   '/employees': typeof EmployeesIndexRoute
@@ -96,10 +208,24 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/coupons': typeof CouponsRoute
+  '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRouteWithChildren
+  '/employers': typeof EmployersRoute
+  '/finance': typeof FinanceRoute
+  '/job-seekers': typeof JobSeekersRoute
+  '/jobs': typeof JobsRoute
+  '/listings': typeof ListingsRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/news-blog': typeof NewsBlogRoute
+  '/orders': typeof OrdersRoute
+  '/pages': typeof PagesRoute
+  '/reviews': typeof ReviewsRoute
   '/service-categories': typeof ServiceCategoriesRoute
   '/services': typeof ServicesRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRoute
   '/vendors': typeof VendorsRouteWithChildren
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
@@ -110,10 +236,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/coupons'
+    | '/dashboard'
     | '/employees'
+    | '/employers'
+    | '/finance'
+    | '/job-seekers'
+    | '/jobs'
+    | '/listings'
     | '/login'
+    | '/messages'
+    | '/news-blog'
+    | '/orders'
+    | '/pages'
+    | '/reviews'
     | '/service-categories'
     | '/services'
+    | '/settings'
+    | '/users'
     | '/vendors'
     | '/employees/$id'
     | '/vendors/$id'
@@ -122,9 +262,23 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/coupons'
+    | '/dashboard'
+    | '/employers'
+    | '/finance'
+    | '/job-seekers'
+    | '/jobs'
+    | '/listings'
     | '/login'
+    | '/messages'
+    | '/news-blog'
+    | '/orders'
+    | '/pages'
+    | '/reviews'
     | '/service-categories'
     | '/services'
+    | '/settings'
+    | '/users'
     | '/employees/$id'
     | '/vendors/$id'
     | '/employees'
@@ -132,10 +286,24 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/coupons'
+    | '/dashboard'
     | '/employees'
+    | '/employers'
+    | '/finance'
+    | '/job-seekers'
+    | '/jobs'
+    | '/listings'
     | '/login'
+    | '/messages'
+    | '/news-blog'
+    | '/orders'
+    | '/pages'
+    | '/reviews'
     | '/service-categories'
     | '/services'
+    | '/settings'
+    | '/users'
     | '/vendors'
     | '/employees/$id'
     | '/vendors/$id'
@@ -145,10 +313,24 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CouponsRoute: typeof CouponsRoute
+  DashboardRoute: typeof DashboardRoute
   EmployeesRoute: typeof EmployeesRouteWithChildren
+  EmployersRoute: typeof EmployersRoute
+  FinanceRoute: typeof FinanceRoute
+  JobSeekersRoute: typeof JobSeekersRoute
+  JobsRoute: typeof JobsRoute
+  ListingsRoute: typeof ListingsRoute
   LoginRoute: typeof LoginRoute
+  MessagesRoute: typeof MessagesRoute
+  NewsBlogRoute: typeof NewsBlogRoute
+  OrdersRoute: typeof OrdersRoute
+  PagesRoute: typeof PagesRoute
+  ReviewsRoute: typeof ReviewsRoute
   ServiceCategoriesRoute: typeof ServiceCategoriesRoute
   ServicesRoute: typeof ServicesRoute
+  SettingsRoute: typeof SettingsRoute
+  UsersRoute: typeof UsersRoute
   VendorsRoute: typeof VendorsRouteWithChildren
 }
 
@@ -159,6 +341,20 @@ declare module '@tanstack/react-router' {
       path: '/vendors'
       fullPath: '/vendors'
       preLoaderRoute: typeof VendorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -175,6 +371,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServiceCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reviews': {
+      id: '/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pages': {
+      id: '/pages'
+      path: '/pages'
+      fullPath: '/pages'
+      preLoaderRoute: typeof PagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news-blog': {
+      id: '/news-blog'
+      path: '/news-blog'
+      fullPath: '/news-blog'
+      preLoaderRoute: typeof NewsBlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -182,11 +413,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/listings': {
+      id: '/listings'
+      path: '/listings'
+      fullPath: '/listings'
+      preLoaderRoute: typeof ListingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/job-seekers': {
+      id: '/job-seekers'
+      path: '/job-seekers'
+      fullPath: '/job-seekers'
+      preLoaderRoute: typeof JobSeekersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/finance': {
+      id: '/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof FinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employers': {
+      id: '/employers'
+      path: '/employers'
+      fullPath: '/employers'
+      preLoaderRoute: typeof EmployersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employees': {
       id: '/employees'
       path: '/employees'
       fullPath: '/employees'
       preLoaderRoute: typeof EmployeesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coupons': {
+      id: '/coupons'
+      path: '/coupons'
+      fullPath: '/coupons'
+      preLoaderRoute: typeof CouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -256,10 +536,24 @@ const VendorsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CouponsRoute: CouponsRoute,
+  DashboardRoute: DashboardRoute,
   EmployeesRoute: EmployeesRouteWithChildren,
+  EmployersRoute: EmployersRoute,
+  FinanceRoute: FinanceRoute,
+  JobSeekersRoute: JobSeekersRoute,
+  JobsRoute: JobsRoute,
+  ListingsRoute: ListingsRoute,
   LoginRoute: LoginRoute,
+  MessagesRoute: MessagesRoute,
+  NewsBlogRoute: NewsBlogRoute,
+  OrdersRoute: OrdersRoute,
+  PagesRoute: PagesRoute,
+  ReviewsRoute: ReviewsRoute,
   ServiceCategoriesRoute: ServiceCategoriesRoute,
   ServicesRoute: ServicesRoute,
+  SettingsRoute: SettingsRoute,
+  UsersRoute: UsersRoute,
   VendorsRoute: VendorsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
