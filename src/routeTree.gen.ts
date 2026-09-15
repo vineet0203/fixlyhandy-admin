@@ -28,11 +28,14 @@ import { Route as EmployersRouteImport } from './routes/employers'
 import { Route as EmployeesRouteImport } from './routes/employees'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CouponsRouteImport } from './routes/coupons'
+import { Route as BookingRequestsRouteImport } from './routes/booking-requests'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendorsIndexRouteImport } from './routes/vendors.index'
 import { Route as EmployeesIndexRouteImport } from './routes/employees.index'
+import { Route as BookingRequestsIndexRouteImport } from './routes/booking-requests.index'
 import { Route as VendorsIdRouteImport } from './routes/vendors.$id'
 import { Route as EmployeesIdRouteImport } from './routes/employees.$id'
+import { Route as BookingRequestsIdRouteImport } from './routes/booking-requests.$id'
 
 const VendorsRoute = VendorsRouteImport.update({
   id: '/vendors',
@@ -129,6 +132,11 @@ const CouponsRoute = CouponsRouteImport.update({
   path: '/coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingRequestsRoute = BookingRequestsRouteImport.update({
+  id: '/booking-requests',
+  path: '/booking-requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -144,6 +152,11 @@ const EmployeesIndexRoute = EmployeesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EmployeesRoute,
 } as any)
+const BookingRequestsIndexRoute = BookingRequestsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BookingRequestsRoute,
+} as any)
 const VendorsIdRoute = VendorsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -154,9 +167,15 @@ const EmployeesIdRoute = EmployeesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => EmployeesRoute,
 } as any)
+const BookingRequestsIdRoute = BookingRequestsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => BookingRequestsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/booking-requests': typeof BookingRequestsRouteWithChildren
   '/coupons': typeof CouponsRoute
   '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRouteWithChildren
@@ -176,8 +195,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
   '/vendors': typeof VendorsRouteWithChildren
+  '/booking-requests/$id': typeof BookingRequestsIdRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
+  '/booking-requests/': typeof BookingRequestsIndexRoute
   '/employees/': typeof EmployeesIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
@@ -200,14 +221,17 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
+  '/booking-requests/$id': typeof BookingRequestsIdRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
+  '/booking-requests': typeof BookingRequestsIndexRoute
   '/employees': typeof EmployeesIndexRoute
   '/vendors': typeof VendorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/booking-requests': typeof BookingRequestsRouteWithChildren
   '/coupons': typeof CouponsRoute
   '/dashboard': typeof DashboardRoute
   '/employees': typeof EmployeesRouteWithChildren
@@ -227,8 +251,10 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
   '/vendors': typeof VendorsRouteWithChildren
+  '/booking-requests/$id': typeof BookingRequestsIdRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/vendors/$id': typeof VendorsIdRoute
+  '/booking-requests/': typeof BookingRequestsIndexRoute
   '/employees/': typeof EmployeesIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
@@ -236,6 +262,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/booking-requests'
     | '/coupons'
     | '/dashboard'
     | '/employees'
@@ -255,8 +282,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/vendors'
+    | '/booking-requests/$id'
     | '/employees/$id'
     | '/vendors/$id'
+    | '/booking-requests/'
     | '/employees/'
     | '/vendors/'
   fileRoutesByTo: FileRoutesByTo
@@ -279,13 +308,16 @@ export interface FileRouteTypes {
     | '/services'
     | '/settings'
     | '/users'
+    | '/booking-requests/$id'
     | '/employees/$id'
     | '/vendors/$id'
+    | '/booking-requests'
     | '/employees'
     | '/vendors'
   id:
     | '__root__'
     | '/'
+    | '/booking-requests'
     | '/coupons'
     | '/dashboard'
     | '/employees'
@@ -305,14 +337,17 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/vendors'
+    | '/booking-requests/$id'
     | '/employees/$id'
     | '/vendors/$id'
+    | '/booking-requests/'
     | '/employees/'
     | '/vendors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookingRequestsRoute: typeof BookingRequestsRouteWithChildren
   CouponsRoute: typeof CouponsRoute
   DashboardRoute: typeof DashboardRoute
   EmployeesRoute: typeof EmployeesRouteWithChildren
@@ -469,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking-requests': {
+      id: '/booking-requests'
+      path: '/booking-requests'
+      fullPath: '/booking-requests'
+      preLoaderRoute: typeof BookingRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -490,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeesIndexRouteImport
       parentRoute: typeof EmployeesRoute
     }
+    '/booking-requests/': {
+      id: '/booking-requests/'
+      path: '/'
+      fullPath: '/booking-requests/'
+      preLoaderRoute: typeof BookingRequestsIndexRouteImport
+      parentRoute: typeof BookingRequestsRoute
+    }
     '/vendors/$id': {
       id: '/vendors/$id'
       path: '/$id'
@@ -504,8 +553,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeesIdRouteImport
       parentRoute: typeof EmployeesRoute
     }
+    '/booking-requests/$id': {
+      id: '/booking-requests/$id'
+      path: '/$id'
+      fullPath: '/booking-requests/$id'
+      preLoaderRoute: typeof BookingRequestsIdRouteImport
+      parentRoute: typeof BookingRequestsRoute
+    }
   }
 }
+
+interface BookingRequestsRouteChildren {
+  BookingRequestsIdRoute: typeof BookingRequestsIdRoute
+  BookingRequestsIndexRoute: typeof BookingRequestsIndexRoute
+}
+
+const BookingRequestsRouteChildren: BookingRequestsRouteChildren = {
+  BookingRequestsIdRoute: BookingRequestsIdRoute,
+  BookingRequestsIndexRoute: BookingRequestsIndexRoute,
+}
+
+const BookingRequestsRouteWithChildren = BookingRequestsRoute._addFileChildren(
+  BookingRequestsRouteChildren,
+)
 
 interface EmployeesRouteChildren {
   EmployeesIdRoute: typeof EmployeesIdRoute
@@ -536,6 +606,7 @@ const VendorsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookingRequestsRoute: BookingRequestsRouteWithChildren,
   CouponsRoute: CouponsRoute,
   DashboardRoute: DashboardRoute,
   EmployeesRoute: EmployeesRouteWithChildren,

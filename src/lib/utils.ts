@@ -17,3 +17,16 @@ export function formatTitleCase(str: string | null | undefined): string {
     .join(" ");
 }
 
+/**
+ * Human label for a booking request: the first quote item, falling back to the
+ * title public bookings generate ("New Unassigned Lead: ac repair").
+ */
+export function bookingRequestServiceLabel(request: {
+  title?: string;
+  items?: { item_name: string }[] | null;
+}): string {
+  const fromItem = request.items?.[0]?.item_name;
+  if (fromItem) return fromItem;
+
+  return request.title?.replace(/^new\s+(unassigned\s+)?lead:\s*/i, "") || request.title || "-";
+}

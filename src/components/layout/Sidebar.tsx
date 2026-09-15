@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { bookingRequestService } from "@/services/bookingRequestService";
 import {
   LayoutDashboard,
   LayoutList,
   Wrench,
+  ClipboardList,
   Store,
   CreditCard,
   Briefcase,
@@ -33,6 +35,8 @@ type Item = {
   href?: string;
   expandable?: boolean;
   subItems?: SubItem[];
+  /** Renders the live unassigned booking request count next to the label */
+  showUnassignedBadge?: boolean;
 };
 
 const items: Item[] = [
@@ -47,6 +51,12 @@ const items: Item[] = [
       { label: "Create Services", href: "/service-categories", search: undefined },
       { label: "All Services", href: "/services", search: undefined },
     ],
+  },
+  {
+    icon: ClipboardList,
+    label: "Booking Requests",
+    href: "/booking-requests",
+    showUnassignedBadge: true,
   },
   {
     icon: Store,
@@ -79,6 +89,25 @@ const items: Item[] = [
 export function Sidebar({ open = true }: { open?: boolean }) {
   const location = useLocation();
   const pathname = location.pathname;
+  const [unassignedCount, setUnassignedCount] = useState(0);
+
+  // Refreshed on navigation so the badge settles after a request is assigned
+  useEffect(() => {
+    let cancelled = false;
+
+    bookingRequestService
+      .getUnassignedCount()
+      .then((count) => {
+        if (!cancelled) setUnassignedCount(count);
+      })
+      .catch(() => {
+        if (!cancelled) setUnassignedCount(0);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
 
   return (
     <aside
@@ -145,6 +174,14 @@ export function Sidebar({ open = true }: { open?: boolean }) {
             >
               <Icon size={18} color={isActive ? "#7C3AED" : "#6B7280"} />
               <span className="text-[13.5px] font-semibold flex-1">{it.label}</span>
+              {it.showUnassignedBadge && unassignedCount > 0 && (
+                <span
+                  className="text-[11px] font-bold rounded-full px-1.5 min-w-[20px] text-center"
+                  style={{ background: "#7C3AED", color: "#fff" }}
+                >
+                  {unassignedCount}
+                </span>
+              )}
               {it.expandable && <Chevron size={14} />}
             </motion.div>
           );
